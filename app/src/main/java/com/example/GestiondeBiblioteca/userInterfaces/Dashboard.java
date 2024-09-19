@@ -5,9 +5,14 @@
 package com.example.GestiondeBiblioteca.userInterfaces;
 
 import com.example.GestiondeBiblioteca.dao.LibroDAO;
+import com.example.GestiondeBiblioteca.dao.UsuarioDAO;
 import com.example.GestiondeBiblioteca.models.Libro;
+import com.example.GestiondeBiblioteca.models.Usuario;
 import java.awt.BorderLayout;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,16 +25,20 @@ import javax.swing.table.DefaultTableModel;
 public class Dashboard extends javax.swing.JFrame {
 
     private LibroDAO libroDAO = new LibroDAO();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private Usuario usuarioAutenticado = new Usuario();
     private JPanel panel;
 
     /**
      * Creates new form GestionLibrosUI
      */
-    public Dashboard() {
+    public Dashboard(Usuario usuarioAutenticado) {
+        this.usuarioAutenticado = usuarioAutenticado;
         initComponents();
         this.setLocationRelativeTo(null);
-
         mostrarLibros();
+        mostrarUsuarioLabel();
+        
     }
 
     /**
@@ -44,8 +53,11 @@ public class Dashboard extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         tbl_data = new javax.swing.JTable();
+        jLabel2 = new javax.swing.JLabel();
+        lbl_usuario_autenticado = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
+        txt_consultarLibros = new javax.swing.JMenuItem();
         txt_agregar = new javax.swing.JMenuItem();
         txt_modificar = new javax.swing.JMenuItem();
         txt_eliminar = new javax.swing.JMenuItem();
@@ -54,10 +66,10 @@ public class Dashboard extends javax.swing.JFrame {
         txt_devolucion = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         txt_registrar_usuario = new javax.swing.JMenu();
+        txt_consultar = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
         txt_editar_usuario = new javax.swing.JMenuItem();
         txt_eliminar_usuarios = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -85,10 +97,20 @@ public class Dashboard extends javax.swing.JFrame {
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 523, Short.MAX_VALUE)
         );
 
+        jLabel2.setText("Usuario conectado: ");
+
         jMenu1.setText("Registrar Libros");
+
+        txt_consultarLibros.setText("Consultar Libros");
+        txt_consultarLibros.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_consultarLibrosActionPerformed(evt);
+            }
+        });
+        jMenu1.add(txt_consultarLibros);
 
         txt_agregar.setText("Agregar Libros");
         txt_agregar.addActionListener(new java.awt.event.ActionListener() {
@@ -99,9 +121,19 @@ public class Dashboard extends javax.swing.JFrame {
         jMenu1.add(txt_agregar);
 
         txt_modificar.setText("Modificar Libros");
+        txt_modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_modificarActionPerformed(evt);
+            }
+        });
         jMenu1.add(txt_modificar);
 
         txt_eliminar.setText("Eliminar Libros");
+        txt_eliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_eliminarActionPerformed(evt);
+            }
+        });
         jMenu1.add(txt_eliminar);
 
         jMenuBar1.add(jMenu1);
@@ -109,7 +141,11 @@ public class Dashboard extends javax.swing.JFrame {
         jMenu2.setText("Prestamos");
 
         txt_prestamos.setText("Registrar Prestamo");
-        txt_prestamos.setActionCommand("Registrar Prestamo");
+        txt_prestamos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_prestamosActionPerformed(evt);
+            }
+        });
         jMenu2.add(txt_prestamos);
 
         txt_devolucion.setText("Registrar Devolución");
@@ -122,19 +158,39 @@ public class Dashboard extends javax.swing.JFrame {
 
         txt_registrar_usuario.setText("Administrar Usuarios");
 
+        txt_consultar.setText("Consultar Usuario");
+        txt_consultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_consultarActionPerformed(evt);
+            }
+        });
+        txt_registrar_usuario.add(txt_consultar);
+
         jMenuItem2.setText("Registrar Usuario");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         txt_registrar_usuario.add(jMenuItem2);
 
         txt_editar_usuario.setText("Editar Usuario");
+        txt_editar_usuario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_editar_usuarioActionPerformed(evt);
+            }
+        });
         txt_registrar_usuario.add(txt_editar_usuario);
 
         txt_eliminar_usuarios.setText("Eliminar Usuarios");
+        txt_eliminar_usuarios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txt_eliminar_usuariosActionPerformed(evt);
+            }
+        });
         txt_registrar_usuario.add(txt_eliminar_usuarios);
 
         jMenuBar1.add(txt_registrar_usuario);
-
-        jMenu4.setText("jMenu4");
-        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -146,11 +202,20 @@ public class Dashboard extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lbl_usuario_autenticado)
+                .addGap(139, 139, 139))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(lbl_usuario_autenticado))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
@@ -159,13 +224,56 @@ public class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void txt_agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_agregarActionPerformed
-        AnadirLibroUI anadirLibroUI = new AnadirLibroUI();
+        AnadirLibroUI anadirLibroUI = new AnadirLibroUI(this);
         anadirLibroUI.setVisible(true);
 
     }//GEN-LAST:event_txt_agregarActionPerformed
 
+    private void txt_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_eliminarActionPerformed
+        EliminarLibroUI eliminarLibroUI = new EliminarLibroUI(this);
+        eliminarLibroUI.setVisible(true);// TODO add your handling code here:
+    }//GEN-LAST:event_txt_eliminarActionPerformed
+
+    private void txt_modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_modificarActionPerformed
+        EditarLibroUI editarLibroUI = new EditarLibroUI(this);
+        editarLibroUI.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_modificarActionPerformed
+
+    private void txt_prestamosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_prestamosActionPerformed
+        RegistrarPrestamoUI registrarPrestamoUI = new RegistrarPrestamoUI(this);
+        registrarPrestamoUI.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_prestamosActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        RegistrarUsuariosUI registrarUsuarioUI = new RegistrarUsuariosUI(this);
+        registrarUsuarioUI.setVisible(true);
+                // TODO add your handling code here:
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void txt_consultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_consultarActionPerformed
+        try {
+            mostrarUsuarios();        // TODO add your handling code here:
+        } catch (SQLException ex) {
+            Logger.getLogger(Dashboard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_txt_consultarActionPerformed
+
+    private void txt_consultarLibrosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_consultarLibrosActionPerformed
+        mostrarLibros();         // TODO add your handling code here:
+    }//GEN-LAST:event_txt_consultarLibrosActionPerformed
+
+    private void txt_editar_usuarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_editar_usuarioActionPerformed
+        EditarUsuarios editarUsuarios = new EditarUsuarios(this);
+        editarUsuarios.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_editar_usuarioActionPerformed
+
+    private void txt_eliminar_usuariosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_eliminar_usuariosActionPerformed
+        EliminarUsuariosUI eliminarUsuariosUI = new EliminarUsuariosUI(this);
+        eliminarUsuariosUI.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_txt_eliminar_usuariosActionPerformed
+
     public void mostrarLibros() {
-        String[] columnNames = {"Id", "Titulo", "Autor", "Categoria", "Estante"};
+        String[] columnNames = {"Titulo", "Autor", "Categoria", "Estado"};
 
         List<Libro> libros = libroDAO.obtenerLibros();
         DefaultTableModel defaultTableModel = (DefaultTableModel) tbl_data.getModel();
@@ -173,16 +281,42 @@ public class Dashboard extends javax.swing.JFrame {
         defaultTableModel.setColumnIdentifiers(columnNames);
 
         for (Libro libro : libros) {
-            Object[] fila = new Object[5];
-            fila[0] = libro.getId();
-            fila[1] = libro.getTitulo();
-            fila[2] = libro.getAutor();
-            fila[3] = libro.getCategoria();
-            fila[4] = libro.getEstante();
+            Object[] fila = new Object[4];
+            fila[0] = libro.getTitulo();
+            fila[1] = libro.getAutor();
+            fila[2] = libro.getCategoria();
+            fila[3] = libro.getEstado();
 
             defaultTableModel.addRow(fila);
         }
+        System.out.println("libros actualizados...");
     }
+    
+    public void mostrarUsuarios() throws SQLException {
+        String[] columnNames = {"Nombres", "rol", "Usuario"};
+
+        List<Usuario> usuarios = usuarioDAO.obtenerUsuarios();
+        DefaultTableModel defaultTableModel = (DefaultTableModel) tbl_data.getModel();
+        defaultTableModel.setRowCount(0);
+        defaultTableModel.setColumnIdentifiers(columnNames);
+
+        for (Usuario usuario : usuarios) {
+            Object[] fila = new Object[4];
+            fila[0] = usuario.getNombre();
+            fila[1] = usuario.getRol();
+            fila[2] = usuario.getUsuario();
+
+            defaultTableModel.addRow(fila);
+        }
+        System.out.println("usuarios actualizados...");
+        System.out.println(usuarioAutenticado.getUsuario());
+    }
+    
+    private void mostrarUsuarioLabel() {
+        lbl_usuario_autenticado.setText(usuarioAutenticado.getUsuario());
+    }
+    
+    
 
     /**
      * @param args the command line arguments
@@ -215,22 +349,25 @@ public class Dashboard extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Dashboard().setVisible(true);
+                new Dashboard(new Usuario()).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lbl_usuario_autenticado;
     private javax.swing.JTable tbl_data;
     private javax.swing.JMenuItem txt_agregar;
+    private javax.swing.JMenuItem txt_consultar;
+    private javax.swing.JMenuItem txt_consultarLibros;
     private javax.swing.JMenuItem txt_devolucion;
     private javax.swing.JMenuItem txt_editar_usuario;
     private javax.swing.JMenuItem txt_eliminar;
@@ -239,4 +376,6 @@ public class Dashboard extends javax.swing.JFrame {
     private javax.swing.JMenuItem txt_prestamos;
     private javax.swing.JMenu txt_registrar_usuario;
     // End of variables declaration//GEN-END:variables
+
+    
 }

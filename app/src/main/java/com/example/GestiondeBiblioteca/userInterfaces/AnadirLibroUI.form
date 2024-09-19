@@ -162,7 +162,7 @@
                 <StringItem index="0" value="Drama"/>
                 <StringItem index="1" value="Terror"/>
                 <StringItem index="2" value="Ciencia Ficcion"/>
-                <StringItem index="3" value=" "/>
+                <StringItem index="3" value=""/>
               </StringArray>
             </Property>
             <Property name="name" type="java.lang.String" value="cbx_categoria" noResource="true"/>

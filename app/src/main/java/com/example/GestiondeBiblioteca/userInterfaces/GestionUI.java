@@ -4,6 +4,7 @@ package com.example.GestiondeBiblioteca.userInterfaces;
 
 import com.example.GestiondeBiblioteca.dao.LibroDAO;
 import com.example.GestiondeBiblioteca.models.Libro;
+import com.example.GestiondeBiblioteca.models.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +36,7 @@ public class GestionUI extends JFrame {
         menuItemAdd.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                    AnadirLibroUI anadirLibroUI = new AnadirLibroUI();
+                    AnadirLibroUI anadirLibroUI = new AnadirLibroUI(new Dashboard(new Usuario()));
                     anadirLibroUI.setVisible(true);
             }
         });
@@ -65,7 +66,7 @@ public class GestionUI extends JFrame {
         setContentPane(panel);
     }
 
-    private void mostrarLibros() {
+    void mostrarLibros() {
         String[] columnNames = {"Id", "Titulo", "Autor", "Categoria", "Estante" };
 
         List<Libro> libros = libroDAO.obtenerLibros();
@@ -77,7 +78,7 @@ public class GestionUI extends JFrame {
             data[i][1] = libro.getTitulo();
             data[i][2] = libro.getAutor();
             data[i][3] = libro.getCategoria();
-            data[i][4] = libro.getEstante();
+            data[i][4] = libro.getEstado();
         }
 
         JTable table = new JTable(data, columnNames);

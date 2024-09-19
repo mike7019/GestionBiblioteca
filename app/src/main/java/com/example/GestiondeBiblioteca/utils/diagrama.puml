@@ -1,0 +1,124 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Usuario {
+    - int id
+    - String nombre
+    - String rol
+    - String usuario
+    - String contrasena
+    + getters()
+    + setters()
+}
+
+class Libro {
+    - int id
+    - String titulo
+    - String autor
+    - String categoria
+    - String estado
+    + getters()
+    + setters()
+}
+
+class Prestamo {
+    - int id
+    - int id_libro
+    - int id_usuario
+    - Date fecha_prestamo
+    - Date fecha_devolucion_esperada
+    - String estado
+    + getters()
+    + setters()
+}
+
+class UsuarioDAO {
+    + agregarUsuario(Usuario usuario)
+    + obtenerUsuarioPorNombreUsuario(String nombreUsuario) : Usuario
+    + actualizarUsuario(Usuario usuario)
+    + eliminarUsuario(String usuario)
+    + autenticarUsuario(String usuario, String contrasena) : Usuario
+}
+
+class LibroDAO {
+    + obtenerLibros() : List<Libro>
+    + agregarLibro(Libro libro)
+    + eliminarLibro(String titulo)
+    + editarLibro(Libro libro)
+    + obtenerLibroPorTitulo(String titulo) : Libro
+}
+
+class PrestamoDAO {
+    + registrarPrestamo(String idLibro, int idUsuario, Date fechaPrestamo, Date fechaDevolucionEsperada)
+    + obtenerPrestamos() : List<Prestamo>
+}
+
+class Dashboard {
+    - LibroDAO libroDAO
+    - UsuarioDAO usuarioDAO
+    - PrestamoDAO prestamoDAO
+    + mostrarLibros()
+    + mostrarUsuarios()
+    + mostrarPrestamos()
+}
+
+class IniciarSesionUI {
+    - UsuarioDAO usuarioDAO
+    + IniciarSesionUI()
+    + btn_iniciar_sesionActionPerformed()
+}
+
+class AnadirLibroUI {
+    - Dashboard dashboard
+    + AnadirLibroUI(Dashboard dashboard)
+    + btn_guardarActionPerformed()
+}
+
+class EditarLibroUI {
+    - Dashboard dashboard
+    - Libro libroActual
+    + EditarLibroUI(Dashboard dashboard)
+    + btn_actualizarActionPerformed()
+    + btn_consultarActionPerformed()
+}
+
+class EliminarLibroUI {
+    - Dashboard dashboard
+    + EliminarLibroUI(Dashboard dashboard)
+    + btn_eliminarActionPerformed()
+}
+
+class EliminarUsuariosUI {
+    - Dashboard dashboard
+    + EliminarUsuariosUI(Dashboard dashboard)
+    + btn_eliminarActionPerformed()
+}
+
+class RegistrarPrestamoUI {
+    - Dashboard dashboard
+    + RegistrarPrestamoUI(Dashboard dashboard)
+    + btn_prestarActionPerformed()
+}
+
+class RegistrarUsuariosUI {
+    - Dashboard dashboard
+    + RegistrarUsuariosUI(Dashboard dashboard)
+    + btn_guardarActionPerformed()
+}
+
+Dashboard --> UsuarioDAO : usa
+Dashboard --> LibroDAO : usa
+Dashboard --> PrestamoDAO : usa
+IniciarSesionUI --> UsuarioDAO : usa
+AnadirLibroUI --> Dashboard : muestra
+EditarLibroUI --> Dashboard : muestra
+EliminarLibroUI --> Dashboard : muestra
+EliminarUsuariosUI --> Dashboard : muestra
+RegistrarPrestamoUI --> Dashboard : muestra
+RegistrarUsuariosUI --> Dashboard : muestra
+UsuarioDAO --> Usuario : maneja
+LibroDAO --> Libro : maneja
+PrestamoDAO --> Prestamo : maneja
+
+@enduml
+	

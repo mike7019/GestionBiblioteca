@@ -7,6 +7,7 @@ package com.example.GestiondeBiblioteca.userInterfaces;
 import com.example.GestiondeBiblioteca.models.Libro;
 
 import com.example.GestiondeBiblioteca.dao.LibroDAO;
+import com.example.GestiondeBiblioteca.models.Usuario;
 
 import javax.swing.JOptionPane;
 
@@ -16,12 +17,13 @@ import javax.swing.JOptionPane;
  */
 public class AnadirLibroUI extends javax.swing.JFrame {
 
-    private Dashboard dashboard = new Dashboard();
+    private Dashboard dashboard;
     
     /**
      * Creates new form AñadirLibroUI
      */
-    public AnadirLibroUI() {
+    public AnadirLibroUI(Dashboard dashboard) {
+        this.dashboard = dashboard; 
         initComponents();
          this.setLocationRelativeTo(null);
     }
@@ -65,7 +67,7 @@ public class AnadirLibroUI extends javax.swing.JFrame {
 
         jLabel4.setText("Categoria");
 
-        cbx_categoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Drama", "Terror", "Ciencia Ficcion", " " }));
+        cbx_categoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Drama", "Terror", "Ciencia Ficcion", "" }));
         cbx_categoria.setName("cbx_categoria"); // NOI18N
 
         cbx_estado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Disponible", "Prestado", "Perdido" }));
@@ -175,16 +177,16 @@ public class AnadirLibroUI extends javax.swing.JFrame {
         String titulo = txt_titulo.getText();
         String autor = txt_autor.getText();
         String categoria = (String) cbx_categoria.getSelectedItem();
-        String estante = (String) cbx_estado.getSelectedItem();
+        String estado = (String) cbx_estado.getSelectedItem();
 
         // Validación básica de los campos
-        if (titulo.isEmpty() || autor.isEmpty() || categoria.isEmpty() || estante.isEmpty()) {
+        if (titulo.isEmpty() || autor.isEmpty() || categoria.isEmpty() || estado.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         // Crear un nuevo objeto Libro
-        Libro nuevoLibro = new Libro(0, titulo, autor, categoria, estante);
+        Libro nuevoLibro = new Libro(0, titulo, autor, categoria, estado);
 
         // Insertar el libro en la base de datos
         try {
@@ -195,12 +197,12 @@ public class AnadirLibroUI extends javax.swing.JFrame {
             // Limpiar los campos después de agregar
             txt_titulo.setText("");
             txt_autor.setText("");
-            cbx_categoria.removeAllItems(); 
-            cbx_categoria.addItem("Terror");
-            cbx_estado.removeAllItems();
-            cbx_estado.addItem("Disponible");
-            
+            cbx_categoria.setSelectedIndex(0);
+            cbx_estado.setSelectedIndex(0);
+           
             dashboard.mostrarLibros();
+            
+            this.dispose();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al agregar el libro: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }        // TODO add your handling code here:
@@ -243,7 +245,7 @@ public class AnadirLibroUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new AnadirLibroUI().setVisible(true);
+                new AnadirLibroUI(new Dashboard(new Usuario())).setVisible(true);
             }
         });
     }

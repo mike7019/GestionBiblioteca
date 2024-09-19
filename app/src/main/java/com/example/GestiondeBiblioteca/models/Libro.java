@@ -7,14 +7,14 @@ public class Libro {
     private String titulo;
     private String autor;
     private String categoria;
-    private String estante;
+    private String estado;
 
-    public Libro(int id, String titulo, String autor, String categoria, String estante) {
+    public Libro(int id, String titulo, String autor, String categoria, String estado) {
         this.id = id;
         this.titulo = titulo;
         this.autor = autor;
         this.categoria = categoria;
-        this.estante = estante;
+        this.estado = estado;
     }
 
     public int getId() {
@@ -49,19 +49,14 @@ public class Libro {
         this.categoria = categoria;
     }
 
-    public String getEstante() {
-        return estante;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setEstante(String estante) {
-        this.estante = estante;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
-    @Override
-    public String toString() {
-        return "Libro{" + "id=" + id + ", titulo=" + titulo + ", autor=" + autor + ", categoria=" + categoria + ", estante=" + estante + '}';
-    }
-    
 
 }
 

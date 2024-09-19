@@ -11,6 +11,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation libs.guava
 
+    implementation 'net.sourceforge.plantuml:plantuml:1.2023.7'
+
 
     implementation 'org.postgresql:postgresql:42.7.4'
     compileOnly 'org.projectlombok:lombok:1.18.24'
@@ -25,9 +27,27 @@ java {
 }
 
 application {
-    mainClass = 'com.example.GestiondeBiblioteca.userInterfaces/IniciarSesionUI'
+    mainClass = 'com.example.GestiondeBiblioteca.userInterfaces.IniciarSesionUI'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+
+task generateUML(type: JavaExec) {
+    description = "Generates UML diagrams from Java source code"
+    group = "documentation"
+
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'net.sourceforge.plantuml.Run'
+
+    args = [
+        '-verbose',                                         // Verbose output to see progress
+        '-tpng',                                            // Output in PNG format
+        'app/src/main/java/com/example/GestiondeBiblioteca/userInterfaces',  // Path to your source code
+        '-o', 'build/uml'                                   // Output directory for UML diagrams
+    ]
+}
+
