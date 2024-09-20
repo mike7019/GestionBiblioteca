@@ -35,10 +35,10 @@ public class EliminarLibroUI extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        txt_eliminar = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         btn_eliminar = new javax.swing.JButton();
         btn_cancelar = new javax.swing.JButton();
-        txt_eliminar1 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -54,10 +54,9 @@ public class EliminarLibroUI extends javax.swing.JFrame {
         });
 
         btn_cancelar.setText("Cancelar");
-
-        txt_eliminar1.addActionListener(new java.awt.event.ActionListener() {
+        btn_cancelar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txt_eliminar1ActionPerformed(evt);
+                btn_cancelarActionPerformed(evt);
             }
         });
 
@@ -68,8 +67,8 @@ public class EliminarLibroUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(txt_eliminar1, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
+                    .addComponent(txt_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btn_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -81,9 +80,9 @@ public class EliminarLibroUI extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addComponent(txt_eliminar1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txt_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_eliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -111,7 +110,7 @@ public class EliminarLibroUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btn_eliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_eliminarActionPerformed
-        String titulo = txt_eliminar1.getText();
+        String titulo = txt_eliminar.getText();
 
         if (titulo.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
@@ -125,7 +124,7 @@ public class EliminarLibroUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Libro eliminado exitosamente");
 
             // Limpiar los campos después de agregar
-            txt_eliminar1.setText("");
+            txt_eliminar.setText("");
             
             dashboard.mostrarLibros();
 
@@ -140,6 +139,10 @@ public class EliminarLibroUI extends javax.swing.JFrame {
     private void txt_eliminar1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_eliminar1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_eliminar1ActionPerformed
+
+    private void btn_cancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelarActionPerformed
+        this.dispose();        // TODO add your handling code here:
+    }//GEN-LAST:event_btn_cancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -182,6 +185,6 @@ public class EliminarLibroUI extends javax.swing.JFrame {
     private javax.swing.JButton btn_eliminar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField txt_eliminar1;
+    private javax.swing.JTextField txt_eliminar;
     // End of variables declaration//GEN-END:variables
 }

@@ -12,9 +12,11 @@ import com.example.GestiondeBiblioteca.models.Usuario;
 import java.awt.Color;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,23 +33,27 @@ import javax.swing.table.DefaultTableModel;
  */
 public class RegistrarPrestamoUI extends javax.swing.JFrame {
 
-     private Dashboard dashboard;
+    private Dashboard dashboard;
     private SimpleDateFormat dateFormat;
     private UsuarioDAO usuarioDAO;
     private LibroDAO libroDAO;
-    
+
     /**
      * Creates new form RegistrarPrestamoUI
      */
     public RegistrarPrestamoUI(Dashboard dashboard) {
         this.dashboard = dashboard;
         initComponents();
-        dashboard.mostrarLibros();
         this.usuarioDAO = new UsuarioDAO();  // DAO para obtener los usuarios
         this.libroDAO = new LibroDAO();
         this.setLocationRelativeTo(null);
         dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        mostrarLibros();
         cargarUsuariosComboBox();  // Llenar el JComboBox con los usuarios
+        Date[] fechas = generarFechas();
+        txt_fecha_prestamo.setText(fechas[0].toString());
+        txt_fecha_devolucion.setText(fechas[1].toString());
+        txt_titulo.setEnabled(false);
     }
 
     /**
@@ -63,8 +69,6 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        btn_prestar = new javax.swing.JButton();
-        btn_cancelar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         txt_titulo = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -72,6 +76,8 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
         txt_fecha_devolucion = new javax.swing.JTextField();
         cbx_usuarios = new javax.swing.JComboBox<>();
         btn_consultar = new javax.swing.JButton();
+        btn_prestar = new javax.swing.JButton();
+        btn_cancelar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbl_libros = new javax.swing.JTable();
 
@@ -79,11 +85,24 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(204, 204, 204));
 
-        jLabel3.setText("ID de usuario");
+        jLabel3.setText("Seleccione ID Usuario:");
 
         jLabel4.setText("Fecha de Prestamo");
 
         jLabel5.setText("Fecha de Devolucion");
+
+        jLabel1.setText("Titulo a prestar");
+
+        txt_titulo.setName("txt_titulo"); // NOI18N
+
+        jLabel2.setText("Registro de Prestamos");
+
+        btn_consultar.setText("Actualizar");
+        btn_consultar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_consultarActionPerformed(evt);
+            }
+        });
 
         btn_prestar.setText("Prestar Libro");
         btn_prestar.setName("btn_prestar"); // NOI18N
@@ -102,66 +121,44 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel1.setText("titulo");
-
-        txt_titulo.setName("txt_titulo"); // NOI18N
-
-        jLabel2.setText("Registro de Prestamos");
-
-        btn_consultar.setText("Consultar");
-        btn_consultar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btn_consultarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel5)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_consultar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(23, 23, 23)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(183, 183, 183)
-                                .addComponent(jLabel2))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txt_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                                .addComponent(btn_consultar, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(btn_prestar, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(37, 37, 37)
-                                .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txt_fecha_prestamo)
+                            .addComponent(cbx_usuarios, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txt_fecha_devolucion, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txt_titulo, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel4))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(txt_fecha_prestamo)
-                                    .addComponent(cbx_usuarios, 0, 255, Short.MAX_VALUE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(txt_fecha_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE)))))
-                .addContainerGap(89, Short.MAX_VALUE))
+                        .addComponent(btn_prestar, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addGap(19, 19, 19))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(135, 135, 135)
+                .addComponent(jLabel2)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+                .addGap(19, 19, 19)
                 .addComponent(jLabel2)
-                .addGap(20, 20, 20)
+                .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
                     .addComponent(cbx_usuarios, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -169,20 +166,20 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txt_fecha_prestamo, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(txt_fecha_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addGap(18, 18, 18)
+                .addGap(24, 24, 24)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btn_prestar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btn_consultar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(31, 31, 31)
+                    .addComponent(jLabel5)
+                    .addComponent(txt_fecha_devolucion, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txt_titulo, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(42, 42, 42))
+                .addGap(31, 31, 31)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btn_consultar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_prestar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btn_cancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(22, 22, 22))
         );
 
         tbl_libros.setModel(new javax.swing.table.DefaultTableModel(
@@ -196,6 +193,11 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tbl_libros.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_librosMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbl_libros);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -206,17 +208,15 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
                 .addGap(9, 9, 9)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(12, 12, 12))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(60, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -227,57 +227,81 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
     }//GEN-LAST:event_btn_cancelarActionPerformed
 
     private void btn_prestarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_prestarActionPerformed
-        String tituloLibro = txt_titulo.getText();
-        String usuarioSeleccionado = (String) cbx_usuarios.getSelectedItem();  // Obtener el nombre de usuario seleccionado
-        String fechaPrestamo = txt_fecha_prestamo.getText();
-        String fechaDevolucion = txt_fecha_devolucion.getText();
 
-        System.out.println(tituloLibro);
-        System.out.println(fechaPrestamo);
+        int filaSeleccionada = tbl_libros.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un libro de la tabla", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        // Asumiendo que la columna 0 es el título
+        String tituloLibro = (String) tbl_libros.getValueAt(filaSeleccionada, 0);
 
-        // Validar campos vacíos
-        if (tituloLibro.isEmpty() || fechaPrestamo.isEmpty() || fechaDevolucion.isEmpty() || usuarioSeleccionado.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Por favor, complete todos los campos", "Error", JOptionPane.ERROR_MESSAGE);
+        // Obtener el usuario seleccionado del JComboBox
+        String usuarioSeleccionado = (String) cbx_usuarios.getSelectedItem();
+        if (usuarioSeleccionado == null) {
+            JOptionPane.showMessageDialog(this, "Por favor, seleccione un usuario", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        try {
-            // Validar y parsear las fechas
-            java.sql.Date sqlFechaPrestamo = new java.sql.Date(dateFormat.parse(fechaPrestamo).getTime());
-            java.sql.Date sqlFechaDevolucion = new java.sql.Date(dateFormat.parse(fechaDevolucion).getTime());
+        Date[] fechas = generarFechas();
+        Date FechaPrestamo = fechas[0];
+        Date sqlFechaDevolucion = fechas[1];
 
-            // Validar que el libro esté disponible
+        // Validar y registrar el préstamo
+        try {
+            PrestamoDAO prestamoDAO = new PrestamoDAO();
             LibroDAO libroDAO = new LibroDAO();
             Libro libro = libroDAO.obtenerLibroPorTitulo(tituloLibro);
+
             if (libro == null) {
                 JOptionPane.showMessageDialog(this, "No se encontró el libro", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            if (!libro.getEstado().equals("Disponible")) {
-                JOptionPane.showMessageDialog(this, "El libro no está disponible para préstamo", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
+            if (btn_prestar.getText() == "Devolver") {
+                prestamoDAO.devolverLibro(libro.getId());
+                mostrarLibros();
+
+            } else {
+                if (!libro.getEstado().equals("Disponible")) {
+                    JOptionPane.showMessageDialog(this, "El libro no está disponible para préstamo", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                prestamoDAO.registrarPrestamo(libro.getId(), usuarioSeleccionado, FechaPrestamo, sqlFechaDevolucion);
+
+                // Actualizar el estado del libro a "Prestado"
+                libro.setEstado("Prestado");
+                libroDAO.editarLibro(libro);
+
+                JOptionPane.showMessageDialog(this, "Préstamo registrado con éxito", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
+
+                // Actualizar la tabla de libros
+                mostrarLibros();
             }
-
-            // Registrar el préstamo usando el DAO
-            PrestamoDAO prestamoDAO = new PrestamoDAO();
-            prestamoDAO.registrarPrestamo(libro.getId(), usuarioSeleccionado, sqlFechaPrestamo, sqlFechaDevolucion);  // Usar el nombre de usuario
-
-            JOptionPane.showMessageDialog(this, "Préstamo registrado con éxito", "Confirmación", JOptionPane.INFORMATION_MESSAGE);
-
-            // Actualizar el Dashboard y cerrar la ventana
-            dashboard.mostrarLibros();
-            this.dispose();
-        } catch (ParseException e) {
-            JOptionPane.showMessageDialog(this, "Por favor, ingrese fechas válidas en el formato dd/MM/yyyy", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error al registrar el préstamo: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_btn_prestarActionPerformed
 
     private void btn_consultarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_consultarActionPerformed
         mostrarLibros();        // TODO add your handling code here:
     }//GEN-LAST:event_btn_consultarActionPerformed
+
+    private void tbl_librosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_librosMouseClicked
+        int filaSeleccionada = tbl_libros.getSelectedRow();
+        String tituloLibro = (String) tbl_libros.getValueAt(filaSeleccionada, 0);
+        String estado = (String) tbl_libros.getValueAt(filaSeleccionada, 3);
+
+        if ("Prestado".equals(estado)) {
+            btn_prestar.setText("Devolver");
+        } else if ("Disponible".equals(estado)) {
+            btn_prestar.setText("Prestar");
+        }
+        txt_titulo.setText(tituloLibro);
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tbl_librosMouseClicked
 
     private void agregarValidacionFecha(JTextField campoFecha) {
         campoFecha.getDocument().addDocumentListener(new DocumentListener() {
@@ -314,8 +338,6 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
         }
     }
 
-
-    
     private void cargarUsuariosComboBox() {
         try {
             List<Usuario> usuarios = usuarioDAO.obtenerUsuarios();
@@ -326,7 +348,23 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error al cargar los usuarios: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
+    private static Date[] generarFechas() {
+        // Generar las fechas automáticamente
+        java.util.Date fechaActual = new java.util.Date();
+        Date fechaPrestamo = new Date(fechaActual.getTime());
+
+        // Calcular la fecha de devolución (un mes después)
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(fechaActual);
+        calendar.add(Calendar.MONTH, 1);
+        java.util.Date fechaDevolucion = calendar.getTime();
+        Date sqlFechaDevolucion = new Date(fechaDevolucion.getTime());
+
+        // Retornar las fechas como un arreglo de cadenas
+        return new Date[]{fechaPrestamo, sqlFechaDevolucion};
+    }
+
     public void mostrarLibros() {
         String[] columnNames = {"Titulo", "Autor", "Categoria", "Estado"};
 
@@ -346,6 +384,7 @@ public class RegistrarPrestamoUI extends javax.swing.JFrame {
         }
         System.out.println("libros actualizados...");
     }
+
     /**
      * @param args the command line arguments
      */
